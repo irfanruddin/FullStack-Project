@@ -1,110 +1,587 @@
-# UrbanCart
+# UrbanCart – Multi-Vendor E-Commerce Platform
 
-Multi-seller e-commerce web app. React + Tailwind CSS (frontend), FastAPI (backend), MySQL (database).
-Built stage by stage from the BRD. **Done so far: stage 1 (foundation, authentication, profile), stage 2 (catalogue, search, reviews, wishlist) and stage 3 (cart, checkout, test payment, invoice).**
+UrbanCart is a full-stack, multi-vendor e-commerce web application designed to connect customers, sellers and administrators through a single online shopping platform.
 
-## Run it
+The platform allows customers to explore products, manage shopping carts, place orders and track purchases. Sellers can manage their shops, products, inventory and customer orders. Administrators will have centralized control over users, sellers, products and overall platform activities.
 
-### 1. Database
-Create an empty MySQL database:
-```sql
-CREATE DATABASE urbancart CHARACTER SET utf8mb4;
+The project is being developed using React, Tailwind CSS, FastAPI and MySQL.
+
+---
+
+## 1. Project Objectives
+
+- Develop a centralized multi-vendor e-commerce platform.
+- Provide a dedicated interface for customers, sellers and administrators.
+- Allow sellers to manage their products and business activities independently.
+- Provide customers with a convenient online shopping experience.
+- Implement secure authentication and role-based access control.
+- Provide administrators with tools to monitor and manage the platform.
+
+---
+
+## 2. User Roles
+
+UrbanCart consists of three primary user roles:
+
+| Role | Description |
+|---|---|
+| Customer | Browses products, manages carts, places orders and tracks purchases. |
+| Seller | Manages shop information, products, inventory, orders and sales. |
+| Admin | Manages platform users, seller approvals, products and overall operations. |
+
+---
+
+## 3. Main Modules and Features
+
+### A. Customer Module
+
+The Customer Module provides the shopping experience.
+
+**Authentication and Account Management**
+- Customer registration and login.
+- Secure password authentication.
+- Account management.
+- Address management.
+
+**Product Discovery**
+- Browse available products.
+- Explore product categories.
+- View product details.
+- Search and discover products.
+- View product images and pricing.
+
+**Shopping Cart and Wishlist**
+- Add products to cart.
+- Update product quantities.
+- Remove products from cart.
+- Manage wishlist items.
+
+**Order Management**
+- Place orders.
+- Checkout and payment simulation.
+- View order history.
+- Track order status.
+- Cancel eligible orders.
+- Submit return requests.
+- View refund status.
+
+### B. Seller Module
+
+The Seller Module provides an independent workspace for sellers.
+
+**Seller Registration and Approval**
+- Seller application.
+- Shop registration.
+- Application status tracking.
+- Pending and rejected application states.
+- Administrator approval workflow (Admin Module pending).
+
+**Seller Dashboard**
+- View shop statistics.
+- Monitor products.
+- View orders requiring processing.
+- Monitor sales performance.
+
+**Product Management**
+- Add new products.
+- Edit product information.
+- Manage product images.
+- Update product prices.
+- Hide or manage products.
+- Manage product inventory.
+
+**Inventory Management**
+- Update available stock.
+- Monitor stock availability.
+- Identify low-stock products.
+
+**Order Management**
+- View seller orders.
+- View order details.
+- Confirm orders.
+- Update order status.
+- Mark orders as shipped or delivered.
+
+**Returns Management**
+- View customer return requests.
+- Approve or reject return requests.
+- Manage return processing.
+
+**Sales and Reports**
+- View sales summaries.
+- Monitor sales performance.
+- Review order-related information.
+
+**Shop Profile**
+- Manage shop name.
+- Update shop description.
+- Manage shop category.
+- Update pickup address and other shop details.
+
+### C. Admin Module – Pending Development
+
+The Admin Module is the remaining major development phase.
+
+It will provide centralized control over the UrbanCart platform.
+
+Planned features include:
+
+**Admin Authentication**
+- Dedicated administrator login.
+- Role-based access.
+- Protected administration routes.
+
+**Dashboard**
+- Total registered customers.
+- Total registered sellers.
+- Total products.
+- Total orders.
+- Sales and platform statistics.
+
+**Seller Management**
+- View seller applications.
+- Approve seller applications.
+- Reject seller applications.
+- Manage existing sellers.
+- Block or unblock sellers.
+
+**Customer Management**
+- View registered customers.
+- Manage customer accounts.
+- Block or unblock accounts.
+
+**Product Management**
+- View all listed products.
+- Monitor product availability.
+- Manage inappropriate or unavailable listings.
+
+**Order Management**
+- View platform orders.
+- Monitor order statuses.
+- Review order information.
+
+**Reports and Analytics**
+- Monitor overall platform performance.
+- View sales reports.
+- Analyze customer and seller activities.
+
+*Note: These are planned Admin Module requirements. They should not be considered completed functionality.*
+
+---
+
+## 4. Technology Stack
+
+### Frontend
+
+| Technology | Purpose |
+|---|---|
+| React.js | Frontend user interface |
+| Vite | Frontend development and build tool |
+| Tailwind CSS | UI styling |
+| React Router DOM | Client-side routing |
+| JavaScript | Application functionality |
+
+### Backend
+
+| Technology | Purpose |
+|---|---|
+| Python | Backend programming language |
+| FastAPI | REST API development |
+| SQLAlchemy | Database ORM |
+| Pydantic | Data validation |
+| PyMySQL | MySQL database connectivity |
+| JWT | Authentication |
+| bcrypt | Password hashing |
+| Uvicorn | ASGI server |
+
+### Database
+
+- MySQL
+- MySQL Workbench
+- SQLAlchemy ORM
+
+### Development Tools
+
+- Visual Studio Code
+- Git
+- GitHub
+- Postman / Swagger UI
+- MySQL Workbench
+
+### Deployment
+
+- Vercel – Planned frontend hosting.
+- Backend hosting – To be finalized.
+- Cloud database hosting – To be finalized.
+
+---
+
+## 5. System Architecture
+
+UrbanCart follows a client-server architecture.
+
+```text
+                 URBANCART
+                     |
+          React + Tailwind Frontend
+                     |
+              React Router
+                     |
+          Role-Based User Interface
+                     |
+             REST API Requests
+                     |
+             FastAPI Backend
+                     |
+          Authentication & Security
+                     |
+              API Routers
+                     |
+              SQLAlchemy ORM
+                     |
+               MySQL Database
+                     |
+        --------------------------------
+        |              |               |
+     Customer        Seller           Admin
+      Module         Module          Module
+   Implemented    Implemented       Pending
 ```
 
-### 2. Backend
+---
+
+## 6. Database Overview
+
+The application uses MySQL with SQLAlchemy models.
+
+The database includes entities for:
+
+| Entity | Purpose |
+|---|---|
+| User | Stores customer, seller and admin accounts |
+| Seller | Stores seller shop information and approval status |
+| SellerDocument | Stores seller verification documents |
+| Category | Stores product categories |
+| Product | Stores product details and inventory |
+| ProductImage | Stores product image references |
+| Order | Stores order and delivery information |
+| OrderItem | Stores individual items in an order |
+| OrderStatusHistory | Maintains order status history |
+| Payment | Stores payment information |
+| ReturnRequest | Stores customer return requests |
+
+Additional entities support addresses, cart and wishlist functionality.
+
+Database tables are defined through SQLAlchemy models and can be created using the application's database initialization process.
+
+---
+
+## 7. Project Structure
+
+```text
+FullStack/
+│
+├── backend/
+│   │
+│   ├── app/
+│   │   ├── routers/
+│   │   │   ├── auth.py
+│   │   │   ├── users.py
+│   │   │   ├── catalogue.py
+│   │   │   ├── cart.py
+│   │   │   ├── checkout.py
+│   │   │   ├── orders.py
+│   │   │   ├── wishlist.py
+│   │   │   └── seller.py
+│   │   │
+│   │   ├── config.py
+│   │   ├── database.py
+│   │   ├── emailer.py
+│   │   ├── main.py
+│   │   ├── models.py
+│   │   ├── schemas.py
+│   │   ├── security.py
+│   │   └── services.py
+│   │
+│   ├── tests/
+│   ├── requirements.txt
+│   └── seed.py
+│
+├── frontend/
+│   │
+│   ├── public/
+│   ├── src/
+│   │   ├── components/
+│   │   │   ├── seller/
+│   │   │   └── ...
+│   │   │
+│   │   ├── pages/
+│   │   │   ├── seller/
+│   │   │   └── ...
+│   │   │
+│   │   ├── App.jsx
+│   │   ├── auth.jsx
+│   │   ├── api.js
+│   │   └── index.css
+│   │
+│   ├── package.json
+│   ├── package-lock.json
+│   └── vite.config.js
+│
+├── _Documents/
+│   ├── BRD
+│   ├── ER Diagrams
+│   ├── Project Reports
+│   └── UI References
+│
+├── .gitignore
+└── README.md
+```
+
+---
+
+## 8. Installation and Setup
+
+### Prerequisites
+
+Install the following:
+
+- Python
+- Node.js and npm
+- MySQL Server
+- MySQL Workbench
+- Visual Studio Code
+- Git
+
+### Step 1: Clone the repository
+
+```bash
+git clone https://github.com/irfanruddin/FullStack-Project.git
+```
+
+```bash
+cd FullStack-Project
+```
+
+### Step 2: Backend Setup
+
+Navigate to the backend:
+
 ```bash
 cd backend
-python -m venv .venv
-.venv\Scripts\activate          # Windows   (Mac/Linux: source .venv/bin/activate)
-pip install -r requirements.txt
-copy .env.example .env          # Mac/Linux: cp .env.example .env   then edit DATABASE_URL and SECRET_KEY
-python seed.py                  # creates the tables, the category list, an admin, a customer, a demo seller with 38 products and some reviews
-                                # (safe to run again; it only adds what is missing)
-uvicorn app.main:app --reload --port 8000
 ```
-API docs open at http://localhost:8000/docs
 
-### 3. Frontend
+Create a virtual environment:
+
+```bash
+python -m venv .venv
+```
+
+Activate it on Windows:
+
+```powershell
+.venv\Scripts\Activate.ps1
+```
+
+Install dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+### Step 3: Database Configuration
+
+Create a MySQL database:
+
+```sql
+CREATE DATABASE urbancart;
+```
+
+Configure the backend `.env` file with the appropriate database connection and security settings.
+
+Example:
+
+```env
+DATABASE_URL=mysql+pymysql://root:YOUR_PASSWORD@localhost:3306/urbancart
+
+SECRET_KEY=YOUR_SECRET_KEY
+
+FRONTEND_URL=http://localhost:5173
+CORS_ORIGINS=http://localhost:5173
+
+LOW_STOCK_LIMIT=5
+UPLOAD_DIR=uploads
+```
+
+Replace the placeholder values with your own configuration.
+
+The application uses SQLAlchemy models for database table initialization.
+
+### Step 4: Start the Backend
+
+From the backend directory:
+
+```bash
+python -m uvicorn app.main:app --reload
+```
+
+Backend development URL:
+
+```text
+http://127.0.0.1:8000
+```
+
+Swagger API documentation:
+
+```text
+http://127.0.0.1:8000/docs
+```
+
+### Step 5: Frontend Setup
+
+Open another terminal and navigate to:
+
 ```bash
 cd frontend
+```
+
+Install frontend dependencies:
+
+```bash
 npm install
-copy .env.example .env          # Mac/Linux: cp .env.example .env
+```
+
+Start the development server:
+
+```bash
 npm run dev
 ```
-Open http://localhost:5173
 
-### Test logins (created by seed.py)
-| Role | Login | Password |
-|---|---|---|
-| Admin (page: /admin/login) | admin@urbancart.local | Admin@123 |
-| Customer | customer@urbancart.local | Customer@123 |
-| Seller (demo shop "Urban Basics", approved) | seller@urbancart.local | Seller@123 |
+Frontend development URL:
 
-The seller panel itself is built in a later stage; the seller's products already show in the shop.
+```text
+http://localhost:5173
+```
 
-Emails (welcome, password reset) are printed in the backend console until you fill in the SMTP values in `.env`.
+### Step 6: Build Frontend
 
-### Tests
+To create a production build:
+
 ```bash
-cd backend
-pytest
+npm run build
 ```
 
-## What stage 1 contains
-- **Database:** every table for the whole project is already in `backend/app/models.py`.
-- **Backend:** all 16 authentication and profile endpoints (register, login, admin login, logout, me, refresh, forgot, reset and change password, profile, addresses), JWT, bcrypt, role checks (`require_role`, `get_approved_seller`), and the email helper.
-- **Frontend:** Tailwind set up with the black, gold and cream theme, API client with automatic token refresh, login (Customer/Seller switch), sign up, forgot and reset password, my account, saved addresses, add and edit address, admin login, header and footer.
-- Pages that later stages build show a "Coming in a later stage" message.
+---
 
-## What stage 2 added
-- **Backend:** `GET /home`, `/categories`, `/products` (filters, search, sort, pages), `/products/{id}`, `/products/{id}/reviews` (list and write), and the wishlist (list, add, remove). Only active products of approved, unblocked sellers are shown. A review needs a delivered order of that product, once per customer.
-- **Frontend:** home page with the full-width banner (back and forward buttons, dots, changes every 10 seconds, pauses on hover), four offer cards, categories, product rows; category page, search results and "all products" (filters in the URL), product page with reviews, write-a-review page, wishlist page with its empty state, and a category menu in the header.
-- Product pictures: the seller panel (later stage) uploads them. Until then cards show a coloured block.
+## 9. API Structure
 
-## What stage 3 added
-- **Backend (11 endpoints):** cart (`GET /cart`, `POST /cart/items`, `PUT` and `DELETE /cart/items/{id}`, `POST /cart/items/{id}/move-to-wishlist`), wishlist moves (`POST /wishlist/{product_id}/move-to-cart`, `POST /wishlist/move-all-to-cart`), checkout (`POST /checkout/validate`, `POST /orders`, `POST /payments/test-pay`, `GET /orders/{order_id}/invoice`).
-- **Frontend:** cart page and empty cart, checkout (address choice, payment choice, review items, summary, out-of-stock alert), online payment page and the "Payment failed" page, order confirmed page with invoice download, "Move all to cart" on the wishlist, cart count in the header.
-- **No database change** from stage 2, so you do not need to recreate the database.
-- Files: `backend/app/services.py` (pricing, stock, order creation), `routers/cart.py`, `routers/checkout.py`, `tests/test_cart_checkout.py` (7 tests).
+The backend uses the `/api/v1` API prefix.
 
-## How checkout works (stage 3)
-1. **Cart rules:** only active products of approved sellers can be added; at most 10 of one product, never more than the stock; an out-of-stock product is refused.
-2. **Totals:** tax is 5% of the order subtotal. Delivery is 40, free when the order subtotal is 500 or more. Both are in `config.py`.
-3. **One order per seller:** a cart with items from two sellers becomes two orders (`UC1A2B3C-1`, `UC1A2B3C-2`), and each gets its own delivery charge.
-4. **Cash on delivery:** the orders are placed at once, the stock goes down, the cart is emptied and a confirmation email is sent.
-5. **Online (test) payment:** the orders are first saved as `pending_payment` and **the stock is not touched**. The customer pays on the test payment page. On success the stock is checked again, reduced, and the orders become `placed`. If the payment fails nothing is placed, and the customer can try again or switch to Cash on Delivery.
-6. **Test payment rules:** a card number ending in **0000** fails, a UPI id containing **fail** fails, anything valid-looking succeeds. No real money, no real gateway.
-7. **Stock check:** if an item sold out while checking out, the order is refused with the item names (409) and the checkout page shows the red alert with "Remove item" and "Back to cart".
-8. **Invoice:** a printable HTML file (open it and choose Print, then Save as PDF).
-9. For later stages: orders with status `pending_payment` are internal and must **not** be shown in order lists, sales or reports.
+Main API areas include:
 
-## Choices in stage 2
-- "Best deals" became **Top rated**, because discounts are a future enhancement in the BRD.
-- The size and colour pickers and the delivery pincode check from the designs are **not built**: no requirement or table behind them yet.
+| API Module | Responsibility |
+|---|---|
+| Authentication | Registration, login and user authentication |
+| Users | User account and address operations |
+| Catalogue | Product and category discovery |
+| Cart | Shopping cart operations |
+| Checkout | Order creation and checkout |
+| Orders | Order history, tracking, cancellation and returns |
+| Wishlist | Wishlist operations |
+| Seller | Seller dashboard and shop management |
 
-## Decisions made while building (change if you disagree)
-1. **One order per seller.** A cart with items from several sellers becomes several orders (the open point in the BRD). The order confirmation page then shows several order numbers.
-2. **Fixed values** in `backend/app/config.py`: tax 5%, delivery charge 40 (free above 500), low stock at 5 units, return window 5 days, 5 days to ship a returned item back. Change them in `.env`.
-3. **Tokens:** access token 30 minutes; refresh token 1 day, or 30 days when "Keep me logged in" is ticked.
-4. **Logout** is handled in the browser (tokens are deleted). The endpoint exists so a block-list can be added later.
-5. **Categories** come from `seed.py` (the admin category screens are out of scope).
+Interactive API documentation is available through FastAPI Swagger UI at `/docs` when the backend is running.
 
-## Next stages
-2. ~~Catalogue~~ done
-3. ~~Cart, checkout and test payment~~ done
-4. Orders (list, tracking), cancellation, returns and refunds
-5. Seller: application, dashboard, products, orders, sales, profile
-6. Admin: dashboard, users, sellers, orders, returns, reports
-7. Emails for every status change, polish, final testing
+---
 
-## Folder map
-```
-backend/app/models.py      all tables
-backend/app/security.py    passwords, tokens, role checks
-backend/app/routers/       one file per module (auth, users, ...)
-backend/app/schemas.py     request and response shapes
-frontend/src/api.js        talks to the backend, refreshes tokens
-frontend/src/auth.jsx      who is logged in
-frontend/src/pages/        one file per page
-frontend/src/components/   header, footer, shared inputs
-```
+## 10. Security
+
+UrbanCart includes security-related functionality such as:
+
+- JWT-based authentication.
+- Password hashing using bcrypt.
+- Role-based access control.
+- Protected frontend routes.
+- Seller ownership checks for seller operations.
+- Environment-based configuration.
+- Input validation using Pydantic.
+
+Environment files and other sensitive configuration must not be committed to public repositories.
+
+---
+
+## 11. Current Development Status
+
+| Module / Feature | Status |
+|---|---|
+| Customer Authentication | Completed |
+| Customer Account Management | Implemented |
+| Product Catalogue | Implemented |
+| Shopping Cart | Implemented |
+| Wishlist | Implemented |
+| Checkout | Implemented |
+| Order Management | Implemented |
+| Return Requests | Implemented |
+| Seller Authentication | Implemented |
+| Seller Application | Implemented |
+| Seller Dashboard | Implemented |
+| Seller Product Management | Implemented |
+| Seller Inventory Management | Implemented |
+| Seller Order Management | Implemented |
+| Seller Sales | Implemented |
+| Seller Profile | Implemented |
+| Admin Dashboard | Pending |
+| Admin Seller Management | Pending |
+| Admin Customer Management | Pending |
+| Admin Product Management | Pending |
+| Admin Reports | Pending |
+| Production Deployment | In Progress |
+
+---
+
+## 12. Future Enhancements
+
+The following enhancements may be considered in future development:
+
+- Complete administrator dashboard.
+- Advanced sales analytics.
+- Enhanced reporting and filtering.
+- Cloud-based image storage.
+- Production email notification configuration.
+- Production deployment and monitoring.
+- Additional payment gateway integration.
+- Improved platform security and performance.
+
+---
+
+## 13. Project Documentation
+
+Supporting project documentation is maintained in the `_Documents` directory.
+
+It includes:
+
+- Business Requirements Document (BRD).
+- High-Level Design (HLD).
+- Entity Relationship Diagrams.
+- Project reports.
+- UI design references.
+
+---
+
+## 14. Contributors
+
+**Project:** UrbanCart – Multi-Vendor E-Commerce Platform
+
+**Developed as:** Academic / Full-Stack Development Project
+
+The application is being developed collaboratively, with responsibilities distributed across authentication, product catalogue, seller management, order processing and administration.
+
+---
+
+## 15. License
+
+This project is developed for academic and learning purposes.
+
+---
+
+**UrbanCart – Bringing Customers and Sellers Together.**
