@@ -25,6 +25,7 @@ UrbanCart consists of three primary user roles:
 
 | Role | Description |
 |---|---|
+| Guest | Browses and see products |
 | Customer | Browses products, manages carts, places orders and tracks purchases. |
 | Seller | Manages shop information, products, inventory, orders and sales. |
 | Admin | Manages platform users, seller approvals, products and overall operations. |
