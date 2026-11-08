@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { api, imageUrl } from "../../api";
 import { useAuth } from "../../auth";
 import { ErrorBox, NoticeBox } from "../../components/ui";
+import { useModal } from "../../components/ModalContext";
 
 const routeTabs = { "/seller/dashboard": "Overview", "/seller/products": "Products", "/seller/orders": "Orders", "/seller/sales": "Sales", "/seller/profile": "Shop profile" };
 const money = (n) => `₹${Number(n || 0).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
@@ -14,6 +15,7 @@ function Panel({ title, children, action }) {
 function Stat({ label, value }) { return <div className="card p-5"><p className="text-sm text-muted">{label}</p><p className="mt-2 text-2xl font-bold">{value}</p></div>; }
 
 export default function SellerDashboard() {
+  const modal = useModal();
   const { user } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
@@ -58,9 +60,71 @@ export default function SellerDashboard() {
     finally { setBusy(false); }
   };
   const editProduct = (p) => { setEditing(p.id); setForm({ category_id: String(p.category_id), name: p.name, description: p.description || "", price: p.price, stock: p.stock, status: p.status }); window.scrollTo({ top: 0, behavior: "smooth" }); };
-  const removeProduct = async (p) => { if (!confirm(`Delete or hide “${p.name}”?`)) return; try { const r = await api(`/seller/products/${p.id}`, { method: "DELETE" }); setNotice(r.message); await load("Products"); } catch (e) { setError(e.message); } };
-  const changeOrder = async (o) => { const next = ({ placed: "confirmed", confirmed: "shipped", shipped: "delivered" })[o.status]; if (!next || !confirm(`Mark ${o.order_number} as ${next}?`)) return; try { await api(`/seller/orders/${o.id}/status`, { method: "PATCH", body: { status: next } }); setNotice(`Order updated to ${next}.`); await load("Orders"); } catch (e) { setError(e.message); } };
-  const decideReturn = async (r, status) => { const reject_reason = status === "rejected" ? prompt("Enter reason for rejecting this return:") : null; if (status === "rejected" && !reject_reason?.trim()) return; try { await api(`/seller/returns/${r.id}`, { method: "PATCH", body: { status, reject_reason } }); setNotice(`Return ${status}.`); await load("Returns"); } catch (e) { setError(e.message); } };
+  const removeProduct = async (p) => {
+    const ok = await modal.confirm({
+      title: "Delete Product",
+      message: `Are you sure you want to delete or hide “${p.name}”?`,
+      confirmText: "Delete Product",
+      type: "danger",
+    });
+    if (!ok) return;
+    try {
+      const r = await api(`/seller/products/${p.id}`, { method: "DELETE" });
+      setNotice(r.message);
+      await load("Products");
+    } catch (e) {
+      setError(e.message);
+    }
+  };
+
+  const changeOrder = async (o) => {
+    const next = ({ placed: "confirmed", confirmed: "shipped", shipped: "delivered" })[o.status];
+    if (!next) return;
+    const ok = await modal.confirm({
+      title: "Update Order Status",
+      message: `Mark order #${o.order_number} as ${next}?`,
+      confirmText: `Mark as ${next}`,
+      type: "info",
+    });
+    if (!ok) return;
+    try {
+      await api(`/seller/orders/${o.id}/status`, { method: "PATCH", body: { status: next } });
+      setNotice(`Order updated to ${next}.`);
+      await load("Orders");
+    } catch (e) {
+      setError(e.message);
+    }
+  };
+
+  const decideReturn = async (r, status) => {
+    let reject_reason = null;
+    if (status === "rejected") {
+      const reason = await modal.prompt({
+        title: "Reject Return Request",
+        message: `Enter reason for rejecting return for item “${r.item}”:`,
+        placeholder: "Write reason for rejection...",
+        confirmText: "Reject Return",
+        type: "danger",
+      });
+      if (!reason || !reason.trim()) return;
+      reject_reason = reason.trim();
+    } else {
+      const ok = await modal.confirm({
+        title: "Approve Return",
+        message: `Are you sure you want to approve this return request for “${r.item}”?`,
+        confirmText: "Approve Return",
+        type: "info",
+      });
+      if (!ok) return;
+    }
+    try {
+      await api(`/seller/returns/${r.id}`, { method: "PATCH", body: { status, reject_reason } });
+      setNotice(`Return ${status}.`);
+      await load("Returns");
+    } catch (e) {
+      setError(e.message);
+    }
+  };
   const saveProfile = async (e) => { e.preventDefault(); try { await api("/seller/profile", { method: "PUT", body: profile }); setNotice("Shop profile updated."); } catch (e2) { setError(e2.message); } };
 
   if (user?.seller_status !== "approved") return <main className="mx-auto max-w-4xl px-6 py-16"><NoticeBox>Your seller account status is <b>{user?.seller_status || "pending"}</b>. Seller tools become available after admin approval.</NoticeBox><p className="text-sm text-muted">Please check again after your application has been reviewed.</p></main>;

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, Outlet, useNavigate, Navigate } from "react-router-dom";
+import { Link, Outlet, useNavigate, Navigate, useLocation, useSearchParams } from "react-router-dom";
 import { api } from "../api";
 import { useCart } from "../cartContext";
 import { useAuth } from "../auth";
@@ -10,6 +10,30 @@ function Header() {
   const { count } = useCart();
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const urlQ = searchParams.get("q") || "";
+  const [searchVal, setSearchVal] = useState(urlQ);
+
+  useEffect(() => {
+    setSearchVal(urlQ);
+  }, [urlQ]);
+
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    const query = searchVal.trim();
+    const next = new URLSearchParams();
+    if (query) next.set("q", query);
+
+    // Preserve existing category_id filter if present on products/search
+    const existingCat = searchParams.get("category_id");
+    if (existingCat) {
+      next.set("category_id", existingCat);
+    }
+
+    const qs = next.toString();
+    navigate(qs ? `/products?${qs}` : "/products");
+  };
+
   const home =
     user?.role === "seller"
       ? "/seller/dashboard"
@@ -18,23 +42,40 @@ function Header() {
         : "/account";
   return (
     <>
-      <header className="bg-ink text-cream">
+      <header className="sticky top-0 z-50 bg-ink text-cream shadow-md">
         <div className="mx-auto max-w-[1200px] flex flex-wrap items-center gap-x-8 gap-y-3 px-6 py-4">
           <Link to="/" className="font-display text-3xl font-bold hover:text-gold transition-colors">
             UrbanCart
           </Link>
           <form
-            className="flex-1 min-w-[240px]"
-            onSubmit={(e) => {
-              e.preventDefault();
-              navigate(`/search?q=${encodeURIComponent(e.target.q.value)}`);
-            }}
+            className="relative flex-1 min-w-[240px]"
+            onSubmit={handleSearchSubmit}
           >
             <input
               name="q"
-              className="w-full rounded-lg bg-card text-body px-5 min-h-[40px] text-sm outline-none"
+              value={searchVal}
+              onChange={(e) => setSearchVal(e.target.value)}
+              className="w-full rounded-lg bg-card text-body px-5 pr-10 min-h-[40px] text-sm outline-none"
               placeholder="Search products, categories and sellers"
             />
+            {searchVal && (
+              <button
+                type="button"
+                onClick={() => {
+                  setSearchVal("");
+                  const next = new URLSearchParams(searchParams);
+                  next.delete("q");
+                  next.delete("page");
+                  const qs = next.toString();
+                  navigate(qs ? `/products?${qs}` : "/products");
+                }}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-ink text-lg px-1 font-bold leading-none"
+                title="Clear search"
+                aria-label="Clear search"
+              >
+                ×
+              </button>
+            )}
           </form>
           <nav className="flex items-center gap-6 text-sm font-medium">
             {user?.role === "seller" ? (
@@ -191,16 +232,16 @@ function CategoryStrip() {
 
 function Footer() {
   return (
-    <footer className="bg-ink text-[#CFC6AE] mt-16">
-      <div className="mx-auto max-w-[1200px] flex flex-wrap items-center justify-between gap-4 px-6 py-8 text-sm">
-        <span className="font-display text-2xl font-bold text-cream">
+    <footer className="bg-ink text-cream mt-16 border-t border-[#2A2A2A]">
+      <div className="mx-auto max-w-[1200px] flex flex-wrap items-center justify-between gap-x-8 gap-y-3 px-6 py-4 text-sm">
+        <Link to="/" className="font-display text-3xl font-bold text-cream hover:text-gold transition-colors">
           UrbanCart
-        </span>
-        <nav className="flex gap-6">
-          <Link to="/about" className="hover:text-gold transition-colors">About</Link>
-          <Link to="/help" className="hover:text-gold transition-colors">Help</Link>
-          <Link to="/seller/apply" className="hover:text-gold transition-colors">Sell on UrbanCart</Link>
-          <Link to="/terms" className="hover:text-gold transition-colors">Terms</Link>
+        </Link>
+        <nav className="flex items-center gap-6 text-sm font-medium">
+          <Link to="/about" className="header-nav-link">About</Link>
+          <Link to="/help" className="header-nav-link">Help</Link>
+          <Link to="/seller/apply" className="header-nav-link">Sell on UrbanCart</Link>
+          <Link to="/terms" className="header-nav-link">Terms</Link>
         </nav>
       </div>
     </footer>
@@ -209,13 +250,16 @@ function Footer() {
 
 export default function Layout() {
   const { user, loading } = useAuth();
+  const location = useLocation();
+  const isHomePage = location.pathname === "/";
+
   if (loading) return null;
   // A seller who opens a customer-store URL is returned to the separate seller workspace.
   if (user?.role === "seller") return <Navigate to={user.seller_status === "approved" ? "/seller/dashboard" : "/seller/application"} replace />;
   return (
-    <div className="min-h-screen flex flex-col overflow-x-hidden">
+    <div className="min-h-screen flex flex-col overflow-x-clip">
       <Header />
-      <CategoryStrip />
+      {isHomePage && <CategoryStrip />}
       <main className="flex-1 mx-auto w-full max-w-[1200px] px-6 py-8">
         <Outlet />
       </main>

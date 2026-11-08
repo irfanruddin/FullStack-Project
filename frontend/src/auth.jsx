@@ -10,8 +10,14 @@ export function AuthProvider({ children }) {
 
   // On page load, ask the server who is logged in
   useEffect(() => {
-    if (!tokens.access) { setLoading(false); return; }
-    api("/auth/me").then((d) => setUser(toUser(d))).catch(() => tokens.clear()).finally(() => setLoading(false));
+    if (!tokens.access) {
+      setLoading(false);
+      return;
+    }
+    api("/auth/me")
+      .then((d) => setUser(toUser(d)))
+      .catch(() => tokens.clear())
+      .finally(() => setLoading(false));
   }, []);
 
   // path is "/auth/login" or "/auth/admin/login"
@@ -23,7 +29,11 @@ export function AuthProvider({ children }) {
   };
 
   const logout = async () => {
-    try { await api("/auth/logout", { method: "POST" }); } catch { /* ignore */ }
+    try {
+      await api("/auth/logout", { method: "POST" });
+    } catch {
+      /* ignore */
+    }
     tokens.clear();
     setUser(null);
   };
@@ -31,7 +41,9 @@ export function AuthProvider({ children }) {
   const reload = async () => setUser(toUser(await api("/auth/me")));
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout, reload }}>{children}</AuthContext.Provider>
+    <AuthContext.Provider value={{ user, loading, login, logout, reload }}>
+      {children}
+    </AuthContext.Provider>
   );
 }
 

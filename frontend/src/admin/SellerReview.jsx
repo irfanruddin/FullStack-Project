@@ -3,6 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import { api } from "../api";
 import { Card, Pill, fetchBlob, fmtDate, label, useFetch } from "./adminUi";
 import { ErrorBox, NoticeBox } from "../components/ui";
+import { useModal } from "../components/ModalContext";
 
 // Shows an uploaded document. The file needs the login token, so it is fetched and shown from memory.
 function Doc({ sellerId, doc }) {
@@ -30,6 +31,7 @@ function Doc({ sellerId, doc }) {
 }
 
 export default function SellerReview() {
+  const modal = useModal();
   const { id } = useParams();
   const { data: s, error, reload } = useFetch(`/admin/sellers/${id}`);
   const [reason, setReason] = useState("");
@@ -79,7 +81,15 @@ export default function SellerReview() {
             {s.status === "rejected" && (<><p className="mb-3 text-sm text-muted">Rejected. The seller can correct the application and apply again. You can still approve it.</p>
               <button className="btn-gold w-full" onClick={() => act("approve", undefined, "Seller approved.")}>Approve seller</button></>)}
             {s.status === "approved" && (<><p className="mb-3 text-sm text-muted">Blocking hides all this seller's products from customers.</p>
-              <button className="btn-outline w-full" onClick={() => window.confirm("Block this seller?") && act("status", { status: "blocked" }, "Seller blocked.")}>Block seller</button></>)}
+              <button className="btn-outline w-full" onClick={async () => {
+                const ok = await modal.confirm({
+                  title: "Block Seller",
+                  message: `Are you sure you want to block ${s.shop_name || "this seller"}? This will hide all their products from customers.`,
+                  confirmText: "Block Seller",
+                  type: "danger",
+                });
+                if (ok) act("status", { status: "blocked" }, "Seller blocked.");
+              }}>Block seller</button></>)}
             {s.status === "blocked" && (<button className="btn-gold w-full" onClick={() => act("status", { status: "approved" }, "Seller unblocked.")}>Unblock seller</button>)}
           </Card>
           <Card title="History">

@@ -357,7 +357,10 @@
 
 /* Category Card Custom Enhancements */
 .customer-category-card {
-  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
 }
 
 .customer-category-card:hover {
@@ -403,4 +406,3 @@
   outline: none;
   color: #d4af37;
 }
-

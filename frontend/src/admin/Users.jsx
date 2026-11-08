@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { api } from "../api";
 import { Card, Empty, Pager, Pill, SearchBox, Tabs, Td, Th, fmtDate, useFetch } from "./adminUi";
+import { useModal } from "../components/ModalContext";
 
 export default function Users() {
+  const modal = useModal();
   const [status, setStatus] = useState("all");
   const [q, setQ] = useState("");
   const [page, setPage] = useState(1);
@@ -11,7 +13,14 @@ export default function Users() {
 
   async function toggle(u) {
     const next = u.status === "active" ? "blocked" : "active";
-    if (!window.confirm(`${next === "blocked" ? "Block" : "Unblock"} ${u.name}?`)) return;
+    const isBlocking = next === "blocked";
+    const ok = await modal.confirm({
+      title: isBlocking ? "Block User" : "Unblock User",
+      message: `Are you sure you want to ${isBlocking ? "block" : "unblock"} ${u.name}?`,
+      confirmText: isBlocking ? "Block User" : "Unblock User",
+      type: isBlocking ? "danger" : "info",
+    });
+    if (!ok) return;
     try { await api(`/admin/users/${u.id}/status`, { method: "PATCH", body: { status: next } }); reload(); } catch (e) { setError(e.message); }
   }
 

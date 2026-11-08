@@ -5,6 +5,7 @@ import App from "./App.jsx";
 import { AuthProvider } from "./auth.jsx";
 import { WishlistProvider } from "./wishlist.jsx";
 import { CartProvider } from "./cartContext.jsx";
+import { ModalProvider } from "./components/ModalContext.jsx";
 import "./index.css";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
@@ -13,7 +14,9 @@ ReactDOM.createRoot(document.getElementById("root")).render(
       <AuthProvider>
         <WishlistProvider>
           <CartProvider>
-            <App />
+            <ModalProvider>
+              <App />
+            </ModalProvider>
           </CartProvider>
         </WishlistProvider>
       </AuthProvider>

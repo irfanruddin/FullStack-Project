@@ -132,7 +132,7 @@ def categories(db: Session = Depends(get_db)):
 # ---------- product list and search ----------
 @router.get("/products")
 def list_products(
-    category_id: Optional[int] = None, sub_id: Optional[int] = None, q: Optional[str] = None,
+    category_id: Optional[str] = None, sub_id: Optional[int] = None, q: Optional[str] = None,
     min_price: Optional[float] = None, max_price: Optional[float] = None,
     rating: Optional[float] = None, in_stock: bool = False,
     sort: str = "newest", page: int = Query(1, ge=1), limit: int = Query(9, ge=1, le=48),
@@ -145,19 +145,39 @@ def list_products(
         cat = db.get(Category, sub_id)
         heading = cat.name if cat else None
     elif category_id:
-        cat = db.get(Category, category_id)
-        if cat is None:
+        cat_ids = []
+        for part in str(category_id).split(","):
+            part = part.strip()
+            if part.isdigit():
+                cat_ids.append(int(part))
+
+        all_target_ids = set()
+        headings = []
+        for cid in cat_ids:
+            cat = db.get(Category, cid)
+            if cat:
+                headings.append(cat.name)
+                all_target_ids.add(cat.id)
+                for child in cat.children:
+                    all_target_ids.add(child.id)
+
+        if all_target_ids:
+            query = query.filter(Product.category_id.in_(list(all_target_ids)))
+            heading = ", ".join(headings) if len(headings) <= 2 else f"{len(headings)} categories"
+        elif cat_ids:
             raise HTTPException(status.HTTP_404_NOT_FOUND, "Category not found.")
-        ids = [cat.id] + [c.id for c in cat.children]
-        query = query.filter(Product.category_id.in_(ids))
-        heading = cat.name
+
     if q and q.strip():
         for word in q.split():
             like = f"%{word}%"
-            query = query.filter((Product.name.ilike(like)) | (Product.description.ilike(like))
-                                 | (Seller.shop_name.ilike(like))
-                                 | (Product.category_id.in_(
-                                     db.query(Category.id).filter(Category.name.ilike(like)))))
+            matching_cat_ids = db.query(Category.id).filter(Category.name.ilike(like)).subquery()
+            child_cat_ids = db.query(Category.id).filter(Category.parent_id.in_(matching_cat_ids)).subquery()
+            query = query.filter(
+                (Product.name.ilike(like)) | (Product.description.ilike(like))
+                | (Seller.shop_name.ilike(like))
+                | (Product.category_id.in_(matching_cat_ids))
+                | (Product.category_id.in_(child_cat_ids))
+            )
     if min_price is not None:
         query = query.filter(Product.price >= min_price)
     if max_price is not None:
@@ -175,8 +195,9 @@ def list_products(
         query = query.order_by(func.coalesce(s.c.sold, 0).desc(), Product.id.desc())
     elif sort == "rating":
         query = query.order_by(func.coalesce(r.c.avg, 0).desc(), Product.id.desc())
-    elif sort == "relevance" and q:
-        query = query.order_by(case((Product.name.ilike(f"{q.split()[0]}%"), 0), else_=1), Product.id.desc())
+    elif sort == "relevance" and q and q.strip():
+        first_word = q.split()[0]
+        query = query.order_by(case((Product.name.ilike(f"{first_word}%"), 0), else_=1), Product.id.desc())
     else:
         query = query.order_by(Product.id.desc())
 

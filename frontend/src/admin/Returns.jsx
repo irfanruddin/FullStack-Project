@@ -2,10 +2,12 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { api } from "../api";
 import { Card, Empty, Pager, Pill, Td, Th, Tabs, fmtDate, inr, label, useFetch } from "./adminUi";
+import { useModal } from "../components/ModalContext";
 
 const STATUSES = ["requested", "approved", "shipped_back", "received", "refund_owed", "refunded", "rejected"];
 
 export default function Returns() {
+  const modal = useModal();
   const [status, setStatus] = useState("all");
   const [page, setPage] = useState(1);
   const [error, setError] = useState("");
@@ -14,7 +16,13 @@ export default function Returns() {
   const tabs = [["all", "All"], ...STATUSES.map((s) => [s, `${label(s)}${c[s] ? ` (${c[s]})` : ""}`])];
 
   async function paid(r) {
-    if (!window.confirm(`Mark the refund of ${inr(r.refund_amount)} for ${r.customer} as paid?`)) return;
+    const ok = await modal.confirm({
+      title: "Mark Refund as Paid",
+      message: `Mark the refund of ${inr(r.refund_amount)} for ${r.customer} as paid?`,
+      confirmText: "Mark as Paid",
+      type: "info",
+    });
+    if (!ok) return;
     try { await api(`/admin/returns/${r.id}/refund-paid`, { method: "PATCH" }); reload(); } catch (e) { setError(e.message); }
   }
 

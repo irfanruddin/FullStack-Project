@@ -38,12 +38,33 @@ export default function App() {
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/admin/login" element={<AdminLogin />} />
-      <Route path="/admin/*" element={<Protected roles={["admin"]}><AdminApp /></Protected>} />
+      <Route
+        path="/admin/*"
+        element={
+          <Protected roles={["admin"]}>
+            <AdminApp />
+          </Protected>
+        }
+      />
 
       {/* Seller workspace has its own layout, separate from the customer storefront. */}
       <Route path="/seller/apply" element={<SellerApply />} />
-      <Route path="/seller/application" element={<Protected roles={["seller"]}><SellerApplication /></Protected>} />
-      <Route path="/seller" element={<Protected roles={["seller"]}><SellerLayout /></Protected>}>
+      <Route
+        path="/seller/application"
+        element={
+          <Protected roles={["seller"]}>
+            <SellerApplication />
+          </Protected>
+        }
+      />
+      <Route
+        path="/seller"
+        element={
+          <Protected roles={["seller"]}>
+            <SellerLayout />
+          </Protected>
+        }
+      >
         <Route index element={<Navigate to="dashboard" replace />} />
         <Route path="dashboard" element={<SellerDashboard />} />
         <Route path="products" element={<SellerDashboard />} />

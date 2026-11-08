@@ -3,8 +3,10 @@ import { Link } from "react-router-dom";
 import { api } from "../api";
 import AccountMenu from "../components/AccountMenu";
 import { ErrorBox } from "../components/ui";
+import { useModal } from "../components/ModalContext";
 
 export default function Addresses() {
+  const modal = useModal();
   const [list, setList] = useState(null);
   const [error, setError] = useState("");
 
@@ -12,7 +14,13 @@ export default function Addresses() {
   useEffect(() => { load(); }, []);
 
   async function remove(id) {
-    if (!window.confirm("Remove this address?")) return;
+    const ok = await modal.confirm({
+      title: "Remove Address",
+      message: "Are you sure you want to remove this address from your account?",
+      confirmText: "Remove Address",
+      type: "danger",
+    });
+    if (!ok) return;
     try { await api(`/users/me/addresses/${id}`, { method: "DELETE" }); load(); } catch (e) { setError(e.message); }
   }
   async function makeDefault(id) {

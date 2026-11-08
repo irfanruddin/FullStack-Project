@@ -3,10 +3,12 @@ import { Link, useParams } from "react-router-dom";
 import { api } from "../api";
 import { Card, Pill, fmtDate, inr, label, useFetch } from "./adminUi";
 import { ErrorBox, NoticeBox } from "../components/ui";
+import { useModal } from "../components/ModalContext";
 
 const FLOW = ["placed", "confirmed", "shipped", "delivered"];
 
 export default function OrderDetail() {
+  const modal = useModal();
   const { id } = useParams();
   const { data: o, error, reload } = useFetch(`/admin/orders/${id}`);
   const [next, setNext] = useState("");
@@ -23,9 +25,17 @@ export default function OrderDetail() {
     try { await promise; setMsg(ok); reload(); } catch (e) { setErr(e.message); }
   }
   const updateStatus = () => next && run(api(`/admin/orders/${id}/status`, { method: "PATCH", body: { status: next } }), `Status changed to ${next}. The customer was emailed.`);
-  const cancel = () => {
-    const reason = window.prompt("Reason for cancelling this order (the customer and the seller are emailed):");
-    if (reason !== null) run(api(`/admin/orders/${id}/cancel`, { method: "POST", body: { reason } }), "Order cancelled and the stock was put back.");
+  const cancel = async () => {
+    const reason = await modal.prompt({
+      title: `Cancel Order #${o.order_number}`,
+      message: "Reason for cancelling this order (the customer and the seller will be emailed):",
+      placeholder: "Reason for cancellation...",
+      confirmText: "Cancel Order",
+      type: "danger",
+    });
+    if (reason && reason.trim()) {
+      run(api(`/admin/orders/${id}/cancel`, { method: "POST", body: { reason: reason.trim() } }), "Order cancelled and the stock was put back.");
+    }
   };
 
   return (

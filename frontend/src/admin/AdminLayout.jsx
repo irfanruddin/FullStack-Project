@@ -1,5 +1,6 @@
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { useAuth } from "../auth";
+import { useModal } from "../components/ModalContext";
 
 const items = [
   ["/admin", "Dashboard"],
@@ -11,6 +12,7 @@ const items = [
 ];
 
 export default function AdminLayout() {
+  const modal = useModal();
   const { logout } = useAuth();
   const navigate = useNavigate();
 
@@ -39,10 +41,18 @@ export default function AdminLayout() {
         </nav>
 
         <button
-          className="px-4 py-3 text-left text-sm text-[#CFC6AE]"
+          className="px-4 py-3 text-left text-sm text-[#CFC6AE] hover:text-white transition-colors"
           onClick={async () => {
-            await logout();
-            navigate("/admin/login");
+            const ok = await modal.confirm({
+              title: "Confirm Logout",
+              message: "Are you sure you want to log out of the Admin portal?",
+              confirmText: "Yes, Logout",
+              type: "warning",
+            });
+            if (ok) {
+              await logout();
+              navigate("/admin/login");
+            }
           }}
         >
           Log out
