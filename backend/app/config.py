@@ -7,6 +7,10 @@ load_dotenv()
 
 class Settings:
     DATABASE_URL = os.getenv("DATABASE_URL", "mysql+pymysql://root:password@localhost:3306/urbancart")
+    if DATABASE_URL.startswith("mysql://"):
+        DATABASE_URL = DATABASE_URL.replace(
+        "mysql://", "mysql+pymysql://", 1
+    )
     SECRET_KEY = os.getenv("SECRET_KEY", "change-this-secret")
     ALGORITHM = "HS256"
     ACCESS_TOKEN_MINUTES = int(os.getenv("ACCESS_TOKEN_MINUTES", "30"))

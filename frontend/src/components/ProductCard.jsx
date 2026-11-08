@@ -47,7 +47,7 @@ export default function ProductCard({ p }) {
   }
 
   return (
-    <article className="card flex flex-col p-2">
+    <article className="card flex flex-col p-2 transition-all duration-200 hover:shadow-lg hover:-translate-y-1">
       <Link to={`/products/${p.id}`} className="relative block aspect-[4/3] overflow-hidden rounded-lg" style={{ background: tints[p.id % 4] }}>
         {img && <img src={img} alt={p.name} className="h-full w-full object-cover" />}
         <span className={`absolute left-3 top-3 rounded bg-card px-2 py-0.5 text-xs font-bold ${tagColor}`}>{tagText}</span>

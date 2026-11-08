@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import { api } from "../api";
+import { useModal } from "../components/ModalContext";
 
 const money = (value) => `₹${Number(value || 0).toFixed(2)}`;
 const label = (value) => String(value || "").replaceAll("_", " ");
 
 export default function Orders() {
+  const modal = useModal();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -28,7 +30,13 @@ export default function Orders() {
   }, []);
 
   async function cancelOrder(order) {
-    const reason = window.prompt("Please enter a reason for cancellation:");
+    const reason = await modal.prompt({
+      title: "Cancel Order",
+      message: `Please enter a reason for cancelling order #${order.order_number}:`,
+      placeholder: "Reason for cancellation (at least 3 characters)...",
+      confirmText: "Cancel Order",
+      type: "danger",
+    });
     if (!reason || reason.trim().length < 3) return;
     setBusy(`cancel-${order.id}`);
     setNotice("");
@@ -47,9 +55,21 @@ export default function Orders() {
   }
 
   async function returnItem(order, item) {
-    const reason = window.prompt(`Why are you returning ${item.name}?`);
+    const reason = await modal.prompt({
+      title: "Return Item",
+      message: `Why are you returning "${item.name}"?`,
+      placeholder: "Reason for return (at least 3 characters)...",
+      confirmText: "Next",
+      type: "warning",
+    });
     if (!reason || reason.trim().length < 3) return;
-    const comment = window.prompt("Additional details (optional):") || "";
+    const comment = await modal.prompt({
+      title: "Additional Details",
+      message: "Any additional details about the return? (optional)",
+      placeholder: "Additional details...",
+      confirmText: "Submit Return",
+      type: "info",
+    }) || "";
     setBusy(`return-${item.id}`);
     setNotice("");
     try {
