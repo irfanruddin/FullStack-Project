@@ -258,3 +258,149 @@
     overflow: visible;
   }
 }
+
+/* ==========================================================================
+   Customer Storefront: Category Navigation Ticker & Shop by Category Styling
+   ========================================================================== */
+
+/* Category Navigation Ticker */
+.category-ticker-wrapper {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  background-color: #1a1a1a;
+  border-bottom: 1px solid #2e2a24;
+  user-select: none;
+}
+
+.category-ticker-track {
+  display: flex;
+  width: max-content;
+  will-change: transform;
+  animation: categoryTickerScroll 42s linear infinite;
+}
+
+.category-ticker-wrapper:hover .category-ticker-track,
+.category-ticker-wrapper:focus-within .category-ticker-track {
+  animation-play-state: paused;
+}
+
+.category-ticker-group {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.category-ticker-item {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.75rem 0 0.75rem 1.75rem;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: #f7f1e3;
+  white-space: nowrap;
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.category-ticker-item:hover {
+  color: #d4af37;
+}
+
+.category-ticker-item:focus-visible {
+  outline: 2px solid #d4af37;
+  outline-offset: -2px;
+  border-radius: 4px;
+  color: #d4af37;
+}
+
+.category-ticker-separator {
+  display: inline-block;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background-color: rgba(212, 175, 55, 0.45);
+  margin-left: 1.75rem;
+  flex-shrink: 0;
+}
+
+@keyframes categoryTickerScroll {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+@media (max-width: 640px) {
+  .category-ticker-item {
+    padding: 0.625rem 0 0.625rem 1.25rem;
+    font-size: 0.875rem;
+  }
+
+  .category-ticker-separator {
+    margin-left: 1.25rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .category-ticker-wrapper {
+    overflow-x: auto;
+    scrollbar-width: thin;
+  }
+
+  .category-ticker-track {
+    animation: none !important;
+  }
+}
+
+/* Category Card Custom Enhancements */
+.customer-category-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.customer-category-card:hover {
+  transform: translateY(-2px);
+}
+
+/* Header Navigation Links */
+.header-nav-link {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  color: #f7f1e3;
+  transition: color 0.2s ease;
+  padding: 0.25rem 0;
+  text-decoration: none;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.header-nav-link:hover {
+  color: #d4af37;
+}
+
+.header-nav-link::after {
+  content: "";
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0%;
+  height: 2px;
+  background-color: #d4af37;
+  transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 9999px;
+}
+
+.header-nav-link:hover::after,
+.header-nav-link:focus-visible::after {
+  width: 100%;
+}
+
+.header-nav-link:focus-visible {
+  outline: none;
+  color: #d4af37;
+}
+

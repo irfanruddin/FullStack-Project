@@ -86,18 +86,61 @@ export default function Home() {
         ))}
       </div>
 
-      <section className="mt-12">
-        <h2 className="mb-5 font-display text-3xl">Shop by category</h2>
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+      <section className="mt-14">
+        <div className="mb-6 flex items-baseline justify-between">
+          <div>
+            <h2 className="font-display text-3xl">Shop by category</h2>
+            <div className="mt-1 h-1 w-12 rounded-full bg-gold" />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {cats.map((c) => (
-            <div key={c.id} className="card p-5">
-              <Link to={`/category/${c.id}`} className="font-bold">{c.name}</Link>
-              <div className="mt-3 flex flex-wrap gap-2">
-                {c.children.map((s) => (
-                  <Link key={s.id} to={`/category/${c.id}?sub_id=${s.id}`} className="rounded-full bg-[#F1E6C8] px-3 py-1 text-xs">{s.name}</Link>
-                ))}
+            <div
+              key={c.id}
+              className="customer-category-card group flex h-full flex-col justify-between rounded-2xl border border-line bg-card p-6 shadow-sm hover:border-gold/60 hover:shadow-md transition-all duration-200"
+            >
+              <div>
+                {/* 1. Category Title */}
+                <div className="mb-4">
+                  <Link
+                    to={`/category/${c.id}`}
+                    className="font-display text-xl font-bold text-ink transition-colors group-hover:text-gold-dark inline-block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold rounded"
+                  >
+                    {c.name}
+                  </Link>
+                  <div className="mt-1 h-0.5 w-7 rounded-full bg-gold/60 transition-all duration-300 group-hover:w-12" />
+                </div>
+
+                {/* 2. Subcategory Chips */}
+                <div className="flex flex-wrap gap-2">
+                  {c.children.map((s) => (
+                    <Link
+                      key={s.id}
+                      to={`/category/${c.id}?sub_id=${s.id}`}
+                      className="inline-flex items-center rounded-full bg-[#F1E6C8]/75 px-3 py-1.5 text-xs font-medium text-body transition-colors hover:bg-gold hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
+                    >
+                      {s.name}
+                    </Link>
+                  ))}
+                </div>
               </div>
-              <Link to={`/category/${c.id}`} className="link mt-4 block text-sm">Shop {c.name.toLowerCase()}</Link>
+
+              {/* 3. Shop Category Action */}
+              <div className="mt-5 border-t border-line/60 pt-4">
+                <Link
+                  to={`/category/${c.id}`}
+                  className="inline-flex items-center gap-1.5 text-sm font-bold text-gold-dark transition-colors hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold rounded"
+                >
+                  <span>Shop {c.name.toLowerCase()}</span>
+                  <span
+                    aria-hidden="true"
+                    className="transition-transform duration-200 group-hover:translate-x-1"
+                  >
+                    →
+                  </span>
+                </Link>
+              </div>
             </div>
           ))}
         </div>
