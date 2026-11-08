@@ -5,7 +5,7 @@ from fastapi.staticfiles import StaticFiles
 from .config import settings
 from .database import Base, engine
 from . import models  # noqa: F401  (registers every table)
-from .routers import auth, users, catalogue, wishlist, cart, checkout, orders, seller
+from .routers import auth, users, catalogue, wishlist, cart, checkout, orders, seller, admin
 
 app = FastAPI(title="UrbanCart API", version="1.0")
 
@@ -26,7 +26,7 @@ app.include_router(cart.router, prefix=PREFIX)
 app.include_router(checkout.router, prefix=PREFIX)
 app.include_router(orders.router, prefix=PREFIX)
 app.include_router(seller.router, prefix=PREFIX)
-# Admin routes are added in the next project stage.
+app.include_router(admin.router, prefix=PREFIX)
 
 os.makedirs(settings.UPLOAD_DIR, exist_ok=True)
 app.mount("/uploads", StaticFiles(directory=settings.UPLOAD_DIR), name="uploads")

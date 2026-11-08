@@ -25,6 +25,7 @@ import SellerDashboard from "./pages/seller/SellerDashboard";
 import SellerLayout from "./components/seller/SellerLayout";
 import SellerApplication from "./pages/seller/SellerApplication";
 import SellerApply from "./pages/seller/SellerApply";
+import AdminApp from "./admin/AdminApp";
 
 const customer = ["customer"];
 
@@ -37,6 +38,7 @@ export default function App() {
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/admin/login" element={<AdminLogin />} />
+      <Route path="/admin/*" element={<Protected roles={["admin"]}><AdminApp /></Protected>} />
 
       {/* Seller workspace has its own layout, separate from the customer storefront. */}
       <Route path="/seller/apply" element={<SellerApply />} />
@@ -147,8 +149,6 @@ export default function App() {
             </Protected>
           }
         />
-        <Route path="/admin" element={<ComingSoon />} />
-        <Route path="/admin/*" element={<ComingSoon />} />
         <Route path="/about" element={<ComingSoon />} />
         <Route path="/help" element={<ComingSoon />} />
         <Route path="/terms" element={<ComingSoon />} />

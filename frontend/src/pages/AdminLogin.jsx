@@ -28,19 +28,20 @@ export default function AdminLogin() {
 
   return (
     <div className="min-h-screen">
-      <div className="bg-ink text-cream px-8 py-5 flex justify-between items-center">
+      <div className="flex items-center justify-between bg-ink px-8 py-5 text-cream">
         <span className="font-display text-3xl font-bold">UrbanCart</span>
         <span className="text-sm text-[#CFC6AE]">Admin</span>
       </div>
-      <div className="mx-auto mt-16 w-full max-w-[440px] card p-8">
+      <div className="card mx-auto mt-16 w-full max-w-[440px] p-8">
         <h1 className="font-display text-3xl">Admin sign in</h1>
-        <p className="mt-1 mb-6 text-sm text-muted">For UrbanCart administrators only.</p>
+        <p className="mb-6 mt-1 text-sm text-muted">For UrbanCart administrators only.</p>
         <ErrorBox>{error}</ErrorBox>
         <form onSubmit={submit} noValidate>
           <Field label="Email"><input className="input" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="admin@example.com" /></Field>
           <Field label="Password"><PasswordInput value={password} onChange={(e) => setPassword(e.target.value)} /></Field>
-          <button className="btn-gold w-full min-h-[50px] mt-2" disabled={busy}>{busy ? "Please wait..." : "Sign in"}</button>
+          <button className="btn-gold mt-2 min-h-[50px] w-full" disabled={busy}>{busy ? "Please wait..." : "Sign in"}</button>
         </form>
+        <p className="mt-5 text-center text-sm"><Link className="link" to="/forgot-password">Forgot password?</Link></p>
       </div>
       <p className="mt-6 text-center text-sm text-muted">Not an administrator? <Link className="link" to="/login">Go to the customer log in</Link></p>
     </div>
