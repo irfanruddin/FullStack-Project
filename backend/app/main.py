@@ -27,16 +27,3 @@ app.include_router(checkout.router, prefix=PREFIX)
 app.include_router(orders.router, prefix=PREFIX)
 app.include_router(seller.router, prefix=PREFIX)
 app.include_router(admin.router, prefix=PREFIX)
-
-os.makedirs(settings.UPLOAD_DIR, exist_ok=True)
-app.mount("/uploads", StaticFiles(directory=settings.UPLOAD_DIR), name="uploads")
-
-
-@app.on_event("startup")
-def create_tables():
-    Base.metadata.create_all(bind=engine)
-
-
-@app.get("/health")
-def health():
-    return {"status": "ok"}
