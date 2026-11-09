@@ -27,3 +27,8 @@ app.include_router(checkout.router, prefix=PREFIX)
 app.include_router(orders.router, prefix=PREFIX)
 app.include_router(seller.router, prefix=PREFIX)
 app.include_router(admin.router, prefix=PREFIX)
+
+# Health Check Endpoint
+@app.get("/health")
+def health_check():
+    return {"status": "healthy"}
