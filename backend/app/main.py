@@ -28,6 +28,16 @@ app.include_router(orders.router, prefix=PREFIX)
 app.include_router(seller.router, prefix=PREFIX)
 app.include_router(admin.router, prefix=PREFIX)
 
+# Create uploads directory
+os.makedirs(settings.UPLOAD_DIR, exist_ok=True)
+
+# Serve uploaded images publicly
+app.mount(
+    "/uploads",
+    StaticFiles(directory=settings.UPLOAD_DIR),
+    name="uploads"
+)
+
 # Health Check Endpoint
 @app.get("/health")
 def health_check():
