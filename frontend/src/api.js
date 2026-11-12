@@ -99,8 +99,15 @@ export async function api(path, opts = {}) {
 }
 
 // Product images are served by the backend from /uploads
-export const imageUrl = (path) =>
-  path ? `${BASE.replace(/\/api\/v1$/, "")}/uploads/${path}` : null;
+export const imageUrl = (path) => {
+  if (!path) return null;
+
+  if (path.startsWith("http://") || path.startsWith("https://")) {
+    return path;
+  }
+
+  return `${BASE.replace(/\/api\/v1$/, "")}/uploads/${path}`;
+};
 
 // Downloads a file that needs the login token (for example an invoice)
 export async function downloadFile(path, filename) {

@@ -1,4 +1,10 @@
 """Seller workspace: own shop, catalogue, orders, returns and sales summary."""
+
+import os
+import io
+import cloudinary
+import cloudinary.uploader
+
 from datetime import datetime, timedelta
 from decimal import Decimal
 from pathlib import Path
@@ -174,24 +180,93 @@ def delete_product(product_id: int, seller: Seller = Depends(get_approved_seller
     db.delete(p); db.commit()
     return {"message": "Product deleted."}
 
-
 @router.post("/products/{product_id}/images", status_code=201)
-def upload_product_image(product_id: int, file: UploadFile = File(...), seller: Seller = Depends(get_approved_seller), db: Session = Depends(get_db)):
-    p = db.query(Product).filter(Product.id == product_id, Product.seller_id == seller.id).first()
-    if p is None: raise HTTPException(404, "Product not found.")
-    allowed = {"image/jpeg": ".jpg", "image/png": ".png", "image/webp": ".webp"}
-    if file.content_type not in allowed: raise HTTPException(415, "Upload a JPG, PNG or WEBP image.")
+def upload_product_image(
+    product_id: int,
+    file: UploadFile = File(...),
+    seller: Seller = Depends(get_approved_seller),
+    db: Session = Depends(get_db)
+):
+    p = db.query(Product).filter(
+        Product.id == product_id,
+        Product.seller_id == seller.id
+    ).first()
+
+    if p is None:
+        raise HTTPException(404, "Product not found.")
+
+    allowed = {
+        "image/jpeg": "jpg",
+        "image/png": "png",
+        "image/webp": "webp"
+    }
+
+    if file.content_type not in allowed:
+        raise HTTPException(
+            415,
+            "Upload a JPG, PNG or WEBP image."
+        )
+
     data = file.file.read(5 * 1024 * 1024 + 1)
-    if not data or len(data) > 5 * 1024 * 1024: raise HTTPException(400, "Image must be between 1 byte and 5 MB.")
-    folder = Path(settings.UPLOAD_DIR) / "products"
-    folder.mkdir(parents=True, exist_ok=True)
-    name = f"{uuid4().hex}{allowed[file.content_type]}"
-    (folder / name).write_bytes(data)
-    image = ProductImage(product_id=p.id, file_path=f"products/{name}", position=len(p.images))
-    db.add(image); db.commit(); db.refresh(image)
-    return {"id": image.id, "file_path": image.file_path, "position": image.position}
 
+    if not data or len(data) > 5 * 1024 * 1024:
+        raise HTTPException(
+            400,
+            "Image must be between 1 byte and 5 MB."
+        )
 
+    cloud_name = os.getenv("CLOUDINARY_CLOUD_NAME")
+    api_key = os.getenv("CLOUDINARY_API_KEY")
+    api_secret = os.getenv("CLOUDINARY_API_SECRET")
+
+    if not all([cloud_name, api_key, api_secret]):
+        raise HTTPException(
+            500,
+            "Cloudinary configuration is missing."
+        )
+
+    try:
+        cloudinary.config(
+            cloud_name=cloud_name,
+            api_key=api_key,
+            api_secret=api_secret,
+            secure=True
+        )
+
+        result = cloudinary.uploader.upload(
+            io.BytesIO(data),
+            folder="urbancart/products",
+            public_id=uuid4().hex,
+            resource_type="image"
+        )
+
+        image_url = result["secure_url"]
+
+        image = ProductImage(
+            product_id=p.id,
+            file_path=image_url,
+            position=len(p.images)
+        )
+
+        db.add(image)
+        db.commit()
+        db.refresh(image)
+
+        return {
+            "id": image.id,
+            "file_path": image.file_path,
+            "position": image.position
+        }
+
+    except HTTPException:
+        raise
+
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(
+            500,
+            f"Image upload failed: {str(e)}"
+        )
 @router.delete("/products/{product_id}/images/{image_id}")
 def delete_product_image(product_id: int, image_id: int, seller: Seller = Depends(get_approved_seller), db: Session = Depends(get_db)):
     image = db.query(ProductImage).join(Product).filter(Product.id == product_id, Product.seller_id == seller.id,
